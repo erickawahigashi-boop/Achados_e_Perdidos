@@ -1,5 +1,5 @@
 def mostrar_menu():
-print("\n================================")
+  print("\n================================")
 print(" ACHADOS E PERDIDOS DA ESCOLA")
 print("================================")
 print("1 - Cadastrar objeto")
