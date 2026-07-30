@@ -1,7 +1,7 @@
 def mostrar_menu():
   print("\n================================")
   print(" ACHADOS E PERDIDOS DA ESCOLA")
-  print("================================")
+  print("Boas-Vindas")
   print("1 - Cadastrar objeto")
   print("2 - Listar objetos")
   print("3 - Excluir objeto")
