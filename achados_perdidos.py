@@ -53,3 +53,42 @@ def main():
 
 # Inicia o programa
 main()
+
+# ==========================================================
+# FUNÇÃO PARA CADASTRAR UM OBJETO
+# ==========================================================
+def cadastrar_item(itens):
+    # Mostra o título da tela de cadastro.
+    print("\n--- CADASTRO DE OBJETO ---")
+    
+    # Solicita os dados do objeto.
+    nome = input("Nome do objeto: ")
+    descricao = input("Descrição do objeto: ")
+    local = input("Local onde foi encontrado: ")
+    data = input("Data do registro (dd/mm/aaaa): ")
+
+    # Validação dos campos obrigatórios.
+    if nome.strip() == "":
+        print("\nO nome do objeto não pode ficar vazio.")
+        return
+    if descricao.strip() == "":
+        print("\nA descrição não pode ficar vazia.")
+        return
+    if local.strip() == "":
+        print("\nO local não pode ficar vazio.")
+        return
+    if data.strip() == "":
+        print("\nA data não pode ficar vazia.")
+        return
+
+    # Cria o dicionário com os dados do objeto.
+    item = {
+        "nome": nome,
+        "descricao": descricao,
+        "local": local,
+        "data": data
+    }
+
+    # Adiciona o dicionário à lista de objetos.
+    itens.append(item)
+    print("\nObjeto cadastrado com sucesso!")
