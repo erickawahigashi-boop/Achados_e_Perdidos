@@ -1,6 +1,105 @@
-# Código base do projeto
+import csv
+import os
 
-# Função responsável por mostrar o menu
+ARQUIVO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "achados_perdidos.csv")
+ARQUIVO_EXCLUIDOS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "objetos_excluidos.csv")
+CAMPOS = ["nome", "descricao", "local", "data"]
+
+
+def salvar_itens(itens):
+    with open(ARQUIVO, "w", newline="", encoding="utf-8") as arquivo:
+        escritor = csv.DictWriter(arquivo, fieldnames=CAMPOS)
+        escritor.writeheader()
+        escritor.writerows(itens)
+
+
+def carregar_itens():
+    itens = []
+    if os.path.exists(ARQUIVO):
+        with open(ARQUIVO, "r", newline="", encoding="utf-8") as arquivo:
+            leitor = csv.DictReader(arquivo)
+            for linha in leitor:
+                itens.append(linha)
+    return itens
+
+
+def salvar_item_excluido(item, motivo):
+    arquivo_existe = os.path.exists(ARQUIVO_EXCLUIDOS) and os.path.getsize(ARQUIVO_EXCLUIDOS) > 0
+    with open(ARQUIVO_EXCLUIDOS, "a", newline="", encoding="utf-8") as arquivo:
+        campos = CAMPOS + ["motivo_exclusao"]
+        escritor = csv.DictWriter(arquivo, fieldnames=campos)
+        if not arquivo_existe:
+            escritor.writeheader()
+        escritor.writerow({**item, "motivo_exclusao": motivo})
+
+
+def listar_itens(itens):
+    print("\n--- OBJETOS CADASTRADOS ---")
+    if len(itens) == 0:
+        print("Nenhum objeto cadastrado.")
+        return
+    for numero, item in enumerate(itens, start=1):
+        print(f"\nObjeto {numero}")
+        print(f"Nome: {item['nome']}")
+        print(f"Descrição: {item['descricao']}")
+        print(f"Local: {item['local']}")
+        print(f"Data: {item['data']}")
+        print("-" * 30)
+
+
+def cadastrar_item(itens):
+    print("\n--- CADASTRO DE OBJETO ---")
+    nome = input("Nome do objeto: ")
+    descricao = input("Descrição: ")
+    local = input("Local encontrado: ")
+    data = input("Data (dd/mm/aaaa): ")
+    if nome.strip() == "":
+        print("Nome obrigatório.")
+        return
+    if descricao.strip() == "":
+        print("Descrição obrigatória.")
+        return
+    if local.strip() == "":
+        print("Local obrigatório.")
+        return
+    if data.strip() == "":
+        print("Data obrigatória.")
+        return
+    item = {"nome": nome, "descricao": descricao, "local": local, "data": data}
+    itens.append(item)
+    salvar_itens(itens)
+    print("Objeto cadastrado com sucesso!")
+
+
+def excluir_item(itens):
+    print("\n--- EXCLUSÃO DE OBJETO ---")
+    if len(itens) == 0:
+        print("Nenhum objeto cadastrado.")
+        return
+    listar_itens(itens)
+    try:
+        numero = int(input("\nNúmero do objeto: "))
+        if numero < 1 or numero > len(itens):
+            print("Número inválido.")
+            return
+        item_escolhido = itens[numero - 1]
+        print(f"Objeto: {item_escolhido['nome']}")
+        motivo = input("Motivo da exclusão: ")
+        if motivo.strip() == "":
+            print("Motivo obrigatório.")
+            return
+        confirmacao = input("Confirmar exclusão? (S/N): ")
+        if confirmacao.upper() == "S":
+            salvar_item_excluido(item_escolhido, motivo)
+            itens.pop(numero - 1)
+            salvar_itens(itens)
+            print("Objeto excluído com sucesso!")
+        else:
+            print("Exclusão cancelada.")
+    except ValueError:
+        print("Digite somente números.")
+
+
 def mostrar_menu():
     print("\n================================")
     print(" ACHADOS E PERDIDOS DA ESCOLA")
@@ -11,84 +110,23 @@ def mostrar_menu():
     print("4 - Sair")
 
 
-# Função principal do programa
 def main():
-
-    # Cria uma lista vazia.
-    # Ela será utilizada nas próximas aulas.
-    itens = []
-
-    # Mantém o menu funcionando continuamente.
+    itens = carregar_itens()
     while True:
-
-        # Mostra o menu.
         mostrar_menu()
-
-        # Pede para o usuário escolher uma opção.
         opcao = input("\nEscolha uma opção: ")
-
-        # Se o usuário escolher 1.
         if opcao == "1":
-            print("\nAbrindo cadastro de objeto...")
-
-        # Se o usuário escolher 2.
+            cadastrar_item(itens)
         elif opcao == "2":
-            print("\nMostrando objetos cadastrados...")
-
-        # Se o usuário escolher 3.
+            listar_itens(itens)
         elif opcao == "3":
-            print("\nAbrindo exclusão de objeto...")
-
-        # Se o usuário escolher 4.
+            excluir_item(itens)
         elif opcao == "4":
             print("\nPrograma encerrado.")
-
-            # Encerra a repetição.
             break
-
-        # Se o usuário digitar outra coisa.
         else:
             print("\nOpção inválida. Digite 1, 2, 3 ou 4.")
 
 
-# Inicia o programa
-main()
-
-# ==========================================================
-# FUNÇÃO PARA CADASTRAR UM OBJETO
-# ==========================================================
-def cadastrar_item(itens):
-    # Mostra o título da tela de cadastro.
-    print("\n--- CADASTRO DE OBJETO ---")
-    
-    # Solicita os dados do objeto.
-    nome = input("Nome do objeto: ")
-    descricao = input("Descrição do objeto: ")
-    local = input("Local onde foi encontrado: ")
-    data = input("Data do registro (dd/mm/aaaa): ")
-
-    # Validação dos campos obrigatórios.
-    if nome.strip() == "":
-        print("\nO nome do objeto não pode ficar vazio.")
-        return
-    if descricao.strip() == "":
-        print("\nA descrição não pode ficar vazia.")
-        return
-    if local.strip() == "":
-        print("\nO local não pode ficar vazio.")
-        return
-    if data.strip() == "":
-        print("\nA data não pode ficar vazia.")
-        return
-
-    # Cria o dicionário com os dados do objeto.
-    item = {
-        "nome": nome,
-        "descricao": descricao,
-        "local": local,
-        "data": data
-    }
-
-    # Adiciona o dicionário à lista de objetos.
-    itens.append(item)
-    print("\nObjeto cadastrado com sucesso!")
+if __name__ == "__main__":
+    main()
